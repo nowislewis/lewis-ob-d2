@@ -65,6 +65,18 @@
 (defvar ob-d2-command "d2"
   "The d2 command to use to compile and run the D2 code.")
 
+(defun remove-unlicensed-text-from-svg (file-path)
+  "Remove the 'UNLICENSED COPY' text from the SVG at FILE-PATH."
+  (when (and file-path (file-exists-p file-path))
+    (with-temp-buffer
+      (insert-file-contents file-path)
+      (goto-char (point-min))
+      (while (re-search-forward "UNLICENSED COPY" nil t)
+        (replace-match ""))
+      (write-region (point-min) (point-max) file-path))))
+
+      (remove-unlicensed-text-from-svg result)
+
 (defun org-babel-execute:d2 (body params)
   "Execute a BODY of D2 code with org-babel and additional PARAMS.
 This function is called by `org-babel-execute-src-block'."
@@ -80,7 +92,8 @@ This function is called by `org-babel-execute-src-block'."
 
     (with-temp-file in-file (insert body))
     (message cmd)
-    (shell-command cmd)
+    (shell-command (concat cmd " > /dev/null 2>&1"))
+    (remove-unlicensed-text-from-svg out-file)
     nil))
 
 (defun org-babel-prep-session:d2 (&rest _args)
