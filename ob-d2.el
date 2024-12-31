@@ -75,8 +75,6 @@
         (replace-match ""))
       (write-region (point-min) (point-max) file-path))))
 
-      (remove-unlicensed-text-from-svg result)
-
 (defun org-babel-execute:d2 (body params)
   "Execute a BODY of D2 code with org-babel and additional PARAMS.
 This function is called by `org-babel-execute-src-block'."
@@ -91,8 +89,7 @@ This function is called by `org-babel-execute-src-block'."
                   " " (org-babel-process-file-name out-file))))
 
     (with-temp-file in-file (insert body))
-    (message cmd)
-    (shell-command (concat cmd " > /dev/null 2>&1"))
+    (shell-command cmd)
     (remove-unlicensed-text-from-svg out-file)
     nil))
 
